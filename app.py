@@ -69,7 +69,7 @@ def init_db():
         cursor.executemany("INSERT INTO categories (name) VALUES (?)", [(name,) for name in CATEGORY_DEFAULTS])
         conn.commit()
     conn.close()
-
+init_db()
 
 def login_required(view):
     @functools.wraps(view)
