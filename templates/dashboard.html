@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card-grid">
+    <div class="card">
+        <h2>Total Income</h2>
+        <p class="value">{{ income }}</p>
+    </div>
+    <div class="card">
+        <h2>Total Expense</h2>
+        <p class="value">{{ expense }}</p>
+    </div>
+    <div class="card">
+        <h2>Balance</h2>
+        <p class="value">{{ balance }}</p>
+    </div>
+</div>
+
+<div class="section card">
+    <h2>Expense by Category</h2>
+    <div class="chart-layout">
+        <div class="chart-panel">
+            <div class="chart-container">
+                <canvas id="expenseChart" width="420" height="300"></canvas>
+            </div>
+        </div>
+        <div class="chart-details">
+            <div class="summary-item">
+                <h3>Top Expense</h3>
+                <p>{{ chart_data[0]['category'] if chart_data else '—' }}</p>
+            </div>
+            <div class="summary-item">
+                <h3>Expense Categories</h3>
+                <p>{{ chart_data|length }}</p>
+            </div>
+            <div class="summary-item">
+                <h3>Category Total</h3>
+                <p>{{ '₹{:,.2f}'.format(chart_data[0]['total']) if chart_data else '₹0.00' }}</p>
+            </div>
+            <div class="summary-item top-categories-card">
+                <h3>Top Categories</h3>
+                <ul class="top-category-list">
+                    {% for row in chart_data[:5] %}
+                    <li>
+                        <span>{{ row['category'] }}</span>
+                        <span>{{ '₹{:,.2f}'.format(row['total']) }}</span>
+                    </li>
+                    {% else %}
+                    <li class="empty">Add some expenses to see top categories.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="section">
+    <div class="card">
+        <h2>Recent Transactions</h2>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Category</th>
+                        <th>Amount</th>
+                        <th>Type</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for tx in recent %}
+                    <tr>
+                        <td>{{ tx['title'] }}</td>
+                        <td>{{ tx['category'] }}</td>
+                        <td>{{ '₹{:,.2f}'.format(tx['amount']) }}</td>
+                        <td>{{ tx['type'].capitalize() }}</td>
+                        <td>{{ tx['created_at'][:16].replace('T', ' ') if 'T' in tx['created_at'] else tx['created_at'] }}</td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="5" style="padding: 1rem 0;">No recent transactions yet.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        buildPieChart('expenseChart', {{ categories|tojson }}, {{ amounts|tojson }});
+    });
+</script>
+{% endblock %}

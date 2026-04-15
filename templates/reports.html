@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card-grid">
+    <div class="card">
+        <h2>Total Income</h2>
+        <p class="value">{{ income }}</p>
+    </div>
+    <div class="card">
+        <h2>Total Expense</h2>
+        <p class="value">{{ expense }}</p>
+    </div>
+    <div class="card">
+        <h2>Balance</h2>
+        <p class="value">{{ balance }}</p>
+    </div>
+</div>
+
+<div class="section card">
+    <h2>Expense Breakdown</h2>
+    <div class="chart-layout">
+        <div class="chart-panel">
+            <div class="chart-container">
+                <canvas id="reportsChart" width="420" height="300"></canvas>
+            </div>
+        </div>
+        <div class="chart-details">
+            <div class="summary-item">
+                <h3>Top Category</h3>
+                <p>{{ breakdown[0]['category'] if breakdown else '—' }}</p>
+            </div>
+            <div class="summary-item">
+                <h3>Categories Tracked</h3>
+                <p>{{ breakdown|length }}</p>
+            </div>
+            <div class="summary-item">
+                <h3>Total Expense</h3>
+                <p>{{ expense }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="section card">
+    <h2>Category Summary</h2>
+    <div class="summary-list">
+        {% for row in breakdown %}
+        <div class="summary-item">
+            <h3>{{ row['category'] }}</h3>
+            <p>{{ '₹{:,.2f}'.format(row['total']) }}</p>
+        </div>
+        {% else %}
+        <div class="summary-item">
+            <h3>No expenses yet</h3>
+            <p>Add a transaction to start tracking categories.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        buildPieChart('reportsChart', {{ categories|tojson }}, {{ amounts|tojson }});
+    });
+</script>
+{% endblock %}
